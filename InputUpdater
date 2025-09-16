@@ -1,0 +1,21 @@
+    public void LoadBindings()
+    {
+        var rebinds = PlayerPrefs.GetString("rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+        {
+            _inputActions.LoadBindingOverridesFromJson(rebinds);
+            Debug.Log("Bindings loaded");
+        }
+        else
+        {
+            _inputActions.RemoveAllBindingOverrides();
+        }
+    }
+    
+    public void SaveBindings()
+    {
+        var rebinds = _inputActions.SaveBindingOverridesAsJson();
+        PlayerPrefs.SetString("rebinds", rebinds);
+        PlayerPrefs.Save();
+        Debug.Log("Bindings saved");
+    }
