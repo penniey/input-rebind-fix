@@ -1,0 +1,71 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class RebindSaveLoad : MonoBehaviour
+{
+    [SerializeField] private PlayerInput playerInput;
+
+    void Start()
+    {
+        if (playerInput == null)
+            playerInput = FindObjectOfType<PlayerInput>();
+            
+        LoadBindings();
+    }
+
+    void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+            SaveBindings();
+    }
+    void OnDisable()
+    {
+        SaveBindings();
+
+    }
+
+    void OnEnable()
+    {
+        LoadBindings();
+    }
+    void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+            SaveBindings();
+    }
+
+    public void SaveBindings()
+    {
+        if (playerInput != null && playerInput.actions != null)
+        {
+            var rebinds = playerInput.actions.SaveBindingOverridesAsJson();
+            PlayerPrefs.SetString("rebinds", rebinds);
+            PlayerPrefs.Save();
+            Debug.Log("Bindings saved");
+        }
+    }
+
+    public void LoadBindings()
+    {
+        if (playerInput != null && playerInput.actions != null)
+        {
+            var rebinds = PlayerPrefs.GetString("rebinds");
+            if (!string.IsNullOrEmpty(rebinds))
+            {
+                playerInput.actions.LoadBindingOverridesFromJson(rebinds);
+                Debug.Log("Bindings loaded");
+            }
+        }
+    }
+
+    // Call this after each rebind operation
+    public void OnRebindComplete()
+    {
+        SaveBindings();
+    }
+
+    void OnDestroy()
+    {
+        SaveBindings();
+    }
+}
